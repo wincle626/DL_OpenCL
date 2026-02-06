@@ -1,0 +1,91 @@
+/*
+ * Copyright Codeplay Software Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+// clang-format off
+#define SNN_DATA_TYPE  ${DATA_TYPE}
+#define SNN_INDEX_TYPE ${INDEX_TYPE}
+#define SNN_VECTOR_WIDTH ${VECTOR_WIDTH}
+// clang-format on
+
+#include "portdnn/mem_object.h"
+#include "portdnn/status.h"
+
+#include "portdnn/conv2d/conv_type.h"
+
+#include "portdnn/depthwise_conv2d/params.h"
+
+#include "src/depthwise_conv2d/queue_depthwise_conv2d_impl.h"
+
+#include <CL/sycl.hpp>
+
+namespace sycldnn {
+namespace depthwise_conv2d {
+namespace internal {
+
+#ifdef SNN_ENABLE_USM
+template SNNStatus queue_kernel<conv2d::conv_type::Forward, SNN_VECTOR_WIDTH,
+                                SNN_DATA_TYPE, SNN_INDEX_TYPE>(
+    USMMemObject<SNN_DATA_TYPE const>& input,
+    USMMemObject<SNN_DATA_TYPE const>& filter,
+    USMMemObject<SNN_DATA_TYPE>& output,
+    DepthwiseConv2DParams const& kernel_params, SNN_INDEX_TYPE output_size,
+    cl::sycl::queue& queue, const std::vector<cl::sycl::event>& events);
+
+template SNNStatus
+queue_kernel<conv2d::conv_type::InputBackprop, SNN_VECTOR_WIDTH, SNN_DATA_TYPE,
+             SNN_INDEX_TYPE>(USMMemObject<SNN_DATA_TYPE const>& input,
+                             USMMemObject<SNN_DATA_TYPE const>& filter,
+                             USMMemObject<SNN_DATA_TYPE>& output,
+                             DepthwiseConv2DParams const& kernel_params,
+                             SNN_INDEX_TYPE output_size, cl::sycl::queue& queue,
+                             const std::vector<cl::sycl::event>& events);
+
+template SNNStatus
+queue_kernel_fil_bk<SNN_VECTOR_WIDTH, SNN_DATA_TYPE, SNN_INDEX_TYPE>(
+    USMMemObject<SNN_DATA_TYPE const>& input,
+    USMMemObject<SNN_DATA_TYPE const>& filter,
+    USMMemObject<SNN_DATA_TYPE>& output,
+    DepthwiseConv2DParams const& kernel_params, SNN_INDEX_TYPE output_size,
+    cl::sycl::queue& queue, const std::vector<cl::sycl::event>& events);
+#endif
+
+template SNNStatus queue_kernel<conv2d::conv_type::Forward, SNN_VECTOR_WIDTH,
+                                SNN_DATA_TYPE, SNN_INDEX_TYPE>(
+    BufferMemObject<SNN_DATA_TYPE const>& input,
+    BufferMemObject<SNN_DATA_TYPE const>& filter,
+    BufferMemObject<SNN_DATA_TYPE>& output,
+    DepthwiseConv2DParams const& kernel_params, SNN_INDEX_TYPE output_size,
+    cl::sycl::queue& queue, const std::vector<cl::sycl::event>& events);
+
+template SNNStatus
+queue_kernel<conv2d::conv_type::InputBackprop, SNN_VECTOR_WIDTH, SNN_DATA_TYPE,
+             SNN_INDEX_TYPE>(BufferMemObject<SNN_DATA_TYPE const>& input,
+                             BufferMemObject<SNN_DATA_TYPE const>& filter,
+                             BufferMemObject<SNN_DATA_TYPE>& output,
+                             DepthwiseConv2DParams const& kernel_params,
+                             SNN_INDEX_TYPE output_size, cl::sycl::queue& queue,
+                             const std::vector<cl::sycl::event>& events);
+
+template SNNStatus
+queue_kernel_fil_bk<SNN_VECTOR_WIDTH, SNN_DATA_TYPE, SNN_INDEX_TYPE>(
+    BufferMemObject<SNN_DATA_TYPE const>& input,
+    BufferMemObject<SNN_DATA_TYPE const>& filter,
+    BufferMemObject<SNN_DATA_TYPE>& output,
+    DepthwiseConv2DParams const& kernel_params, SNN_INDEX_TYPE output_size,
+    cl::sycl::queue& queue, const std::vector<cl::sycl::event>& events);
+
+}  // namespace internal
+}  // namespace depthwise_conv2d
+}  // namespace sycldnn

@@ -1,0 +1,162 @@
+# Copyright Codeplay Software Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use these files except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cmake_minimum_required(VERSION 3.10.2)
+project(snn_tests)
+include(HandleGTest)
+include(SNNHelpers)
+
+snn_test(
+  WITH_SYCL
+  TARGET
+    basic_sycl
+  KERNEL_SOURCES
+    basic_sycl_test.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    float_comparison
+  SOURCES
+    helpers/float_comparison.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    fast_divison
+  SOURCES
+    helpers/fast_div.cc
+)
+snn_test(
+  TARGET
+    common_macros
+  SOURCES
+    helpers/common_macros.cc
+)
+snn_test(
+  TARGET
+    non_device_macros
+  SOURCES
+    helpers/non_device_macros.cc
+)
+snn_test(
+  TARGET
+    device_macros
+  SOURCES
+    helpers/device_macros.cc
+)
+snn_test(
+  TARGET
+    min_max
+  SOURCES
+    helpers/min_max.cc
+)
+snn_test(
+  TARGET
+    ratio_helpers
+  SOURCES
+    helpers/ratio.cc
+)
+snn_test(
+  TARGET
+    input_window_index_helpers
+  SOURCES
+    helpers/input_window_index.cc
+)
+snn_test(
+  TARGET
+    output_window_index_helpers
+  SOURCES
+    helpers/output_window_index.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    tensor_index
+  SOURCES
+    helpers/tensor_index.cc
+)
+snn_test(
+  TARGET
+    round_to_power_two
+  SOURCES
+    helpers/round_power_two.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    math_helpers
+  SOURCES
+    helpers/math.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    vector_element
+  SOURCES
+    helpers/vector_element.cc
+)
+snn_test(
+  TARGET
+    padding_helpers
+  SOURCES
+    helpers/padding.cc
+)
+snn_test(
+  TARGET
+    add_padding_to_params
+  SOURCES
+    helpers/add_padding_to_params.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    workgroup_reduce
+  KERNEL_SOURCES
+    helpers/workgroup_reduce.cc
+)
+snn_test(
+  WITH_SYCL
+  TARGET
+    selector
+  SOURCES
+    conv2d/default_selector.cc
+  PUBLIC_LIBRARIES
+    sycl_dnn
+)
+snn_test(
+  TARGET
+    conv2d_workspace_size
+  SOURCES
+    conv2d/workspace_size.cc
+)
+
+add_subdirectory(backend)
+add_subdirectory(matmul)
+add_subdirectory(conv2d)
+add_subdirectory(depthwise_conv2d)
+add_subdirectory(pointwise)
+add_subdirectory(pooling)
+add_subdirectory(transpose)
+add_subdirectory(bias)
+add_subdirectory(softmax)
+add_subdirectory(scatter_nd)
+add_subdirectory(batchnorm)
+add_subdirectory(roi_align)
+add_subdirectory(reduce)
+add_subdirectory(binaryop)
+add_subdirectory(gather)
+if(SNN_ENABLE_USM)
+  add_subdirectory(compat)
+endif()

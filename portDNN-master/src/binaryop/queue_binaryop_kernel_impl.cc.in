@@ -1,0 +1,64 @@
+/*
+ * Copyright Codeplay Software Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "src/binaryop/kernels.h"
+#include "src/binaryop/queue_binaryop_kernel_impl.h"
+
+#include "portdnn/binaryop/operators.h"
+
+#include <CL/sycl.hpp>
+
+// clang-format off
+#define SNN_DATA_TYPE         @DATA_TYPE@
+#define SNN_INDEX_TYPE        @INDEX_TYPE@
+#define SNN_OP_TYPE           @OP_TYPE@
+#define SNN_KERNEL_NAME       @KERNEL_NAME@
+#define SNN_KERNEL_EXTRA_ARGS @KERNEL_EXTRA_ARGS@
+
+// clang-format on
+
+namespace sycldnn {
+namespace binaryop {
+namespace internal {
+
+#ifdef SNN_ENABLE_USM
+template SNNStatus queue_binaryop<
+    SNN_KERNEL_NAME<SNN_DATA_TYPE, SNN_OP_TYPE,
+                    SNN_INDEX_TYPE SNN_KERNEL_EXTRA_ARGS, /*IsUSM*/ true>,
+    SNN_DATA_TYPE, SNN_INDEX_TYPE>(USMMemObject<SNN_DATA_TYPE const>& lhs,
+                                   USMMemObject<SNN_DATA_TYPE const>& rhs,
+                                   USMMemObject<SNN_DATA_TYPE>& out,
+                                   const std::vector<SNN_INDEX_TYPE>& lhs_dims,
+                                   const std::vector<SNN_INDEX_TYPE>& rhs_dims,
+                                   const std::vector<SNN_INDEX_TYPE>& out_dims,
+                                   cl::sycl::queue& queue,
+                                   const std::vector<cl::sycl::event>& events);
+#endif
+
+template SNNStatus queue_binaryop<
+    SNN_KERNEL_NAME<SNN_DATA_TYPE, SNN_OP_TYPE,
+                    SNN_INDEX_TYPE SNN_KERNEL_EXTRA_ARGS, /*IsUSM*/ false>,
+    SNN_DATA_TYPE, SNN_INDEX_TYPE>(BufferMemObject<SNN_DATA_TYPE const>& lhs,
+                                   BufferMemObject<SNN_DATA_TYPE const>& rhs,
+                                   BufferMemObject<SNN_DATA_TYPE>& out,
+                                   const std::vector<SNN_INDEX_TYPE>& lhs_dims,
+                                   const std::vector<SNN_INDEX_TYPE>& rhs_dims,
+                                   const std::vector<SNN_INDEX_TYPE>& out_dims,
+                                   cl::sycl::queue& queue,
+                                   const std::vector<cl::sycl::event>& events);
+
+}  // namespace internal
+}  // namespace binaryop
+}  // namespace sycldnn

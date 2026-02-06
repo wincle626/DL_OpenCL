@@ -1,0 +1,69 @@
+/*
+ * Copyright Codeplay Software Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "src/pooling/queue_max_grad_kernel_impl.h"
+
+#include "portdnn/data_format.h"
+#include "portdnn/mem_object.h"
+#include "portdnn/status.h"
+
+#include "portdnn/pooling/operators.h"
+#include "portdnn/pooling/params.h"
+
+#include <CL/sycl.hpp>
+
+// clang-format off
+#define SNN_DATA_TYPE    @DATA_TYPE@
+#define SNN_INDEX_TYPE   @INDEX_TYPE@
+#define SNN_OPERATOR     @OPERATOR@
+#define SNN_DIRECTION    @DIRECTION@
+#define SNN_VECTOR_WIDTH @VECTOR_WIDTH@
+#define SNN_USE_FASTDIV  @USE_FASTDIV@
+#define SNN_DATA_FORMAT  @DATA_FORMAT@
+// clang-format on
+
+namespace sycldnn {
+namespace pooling {
+namespace internal {
+
+template SNNStatus queue_max_grad_pooling<
+    SNN_DATA_TYPE, SNN_INDEX_TYPE, SNN_OPERATOR,
+    sycldnn::pooling::Backpropagate, SNN_VECTOR_WIDTH, SNN_USE_FASTDIV,
+    layout::SNN_DATA_FORMAT, BufferMemObject>(
+    BufferMemObject<SNN_DATA_TYPE const>& input_mem,
+    BufferMemObject<SNN_DATA_TYPE const>& output_mem,
+    BufferMemObject<SNN_DATA_TYPE const>& input_backprop_mem,
+    BufferMemObject<SNN_DATA_TYPE>& output_backprop_mem,
+    const PoolingParams& pp, size_t threads, cl::sycl::queue& queue,
+    const std::vector<cl::sycl::event>& events);
+
+#ifdef SNN_ENABLE_USM
+
+template SNNStatus
+queue_max_grad_pooling<SNN_DATA_TYPE, SNN_INDEX_TYPE, SNN_OPERATOR,
+                       sycldnn::pooling::Backpropagate, SNN_VECTOR_WIDTH,
+                       SNN_USE_FASTDIV, layout::SNN_DATA_FORMAT, USMMemObject>(
+    USMMemObject<SNN_DATA_TYPE const>& input_mem,
+    USMMemObject<SNN_DATA_TYPE const>& output_mem,
+    USMMemObject<SNN_DATA_TYPE const>& input_backprop_mem,
+    USMMemObject<SNN_DATA_TYPE>& output_backprop_mem, const PoolingParams& pp,
+    size_t threads, cl::sycl::queue& queue,
+    const std::vector<cl::sycl::event>& events);
+
+#endif  // SNN_ENABLE_USM
+
+}  // namespace internal
+}  // namespace pooling
+}  // namespace sycldnn

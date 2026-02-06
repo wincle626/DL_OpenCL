@@ -1,0 +1,8 @@
+/**
+ * \namespace sycldnn The root namespace for portDNN.
+ */
+
+/**
+ * \namespace sycldnn::conv2d Functionality relating to 2D convolutions.
+ */
+
