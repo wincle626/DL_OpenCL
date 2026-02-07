@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10.2)
+ptr_test(TARGET basic SOURCES basic.cc)
+ptr_test(TARGET offset SOURCES offset.cc)
+ptr_test(TARGET space SOURCES space.cc)
+ptr_test(TARGET accessor SOURCES accessor.cc)

@@ -1,0 +1,30 @@
+# SYCL files
+*.sycl
+
+# YCM files
+*.ycm_extra_conf.py
+*.ycm_extra_conf.pyc
+.color_coded
+
+# build folder
+build/
+
+# Compiled files
+*.o
+*.so
+*.dll
+*.a
+*.lib
+*.exe
+*.out
+
+# Vim
+*~
+*.tmp
+*.bak
+*.swp
+
+# HTML/PDF output from documentation
+html/
+*.html
+*.pdf
